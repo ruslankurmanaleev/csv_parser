@@ -21,6 +21,7 @@ end
 
 group :development do
   gem "capybara"
+  gem "database_cleaner-active_record"
   gem "listen", "~> 3.2"
   gem "rspec-rails"
   gem "shoulda-matchers", "~> 4.0"
