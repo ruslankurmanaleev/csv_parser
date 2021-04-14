@@ -7,6 +7,7 @@ class CreateProducts < ActiveRecord::Migration[6.0]
       t.integer :stock, default: 0, null: false
       t.decimal :cost, precision: 12, scale: 2, null: false
       t.string :name
+      t.string :uid
 
       t.timestamps
     end
