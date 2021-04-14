@@ -1,0 +1,10 @@
+.products_form
+  = form_with(scope: "price_list", url: price_lists_path, method: :post) do |form|
+    .form-group
+      = form.label(:name, "Название Списка Цен")
+      = form.text_field(:name)
+    .form-group
+      = form.label("Выберите вложение или вложения", class: "header")
+      = form.file_field(:attachments, class: 'form-control-file', required: true, multiple: true)
+    .actions.form-group
+      = form.submit("Обработать список", class: "confirm-button")
