@@ -8,9 +8,9 @@ gem "rails", "~> 6.0.3", ">= 6.0.3.6"
 gem "puma", "~> 4.1"
 gem "pg", ">= 0.18", "< 2.0"
 
-# Assets
+# Front
+gem "slim"
 gem "sass-rails", ">= 6"
-gem "webpacker", "~> 4.0"
 
 # Other
 gem "bootsnap", ">= 1.4.2", require: false
@@ -20,6 +20,7 @@ group :development, :test do
 end
 
 group :development do
+  gem "capybara"
   gem "listen", "~> 3.2"
   gem "rspec-rails"
   gem "shoulda-matchers", "~> 4.0"
