@@ -1,25 +1,21 @@
 require "csv"
 
 class PriceList
-  # Change encoding and delimiter if required
-  ENCODING = "windows-1251".freeze
-  DELIMITER = ";".freeze
-
-  def initialize(name, file, header_params)
+  def initialize(name, file, params)
     @pricelist = name
     @file_path = file
-    @header_params = header_params
+    @params = params
     @skipped_counter = 0
     @created_counter = 0
   end
 
   def parse
-    build_headers
+    set_params
     # We need to clean all existing data with the same PriceList name
     erase_price_list_if_exists!
 
     # With each line of CSV file parse product with headers, so we can have a Hash later
-    CSV.foreach(@file_path, col_sep: DELIMITER, row_sep: :auto, headers: true, nil_value: nil, quote_char: "|", encoding: ENCODING) do |product|
+    CSV.foreach(@file_path, col_sep: @delimeter, row_sep: :auto, headers: true, force_quotes: true, encoding: @encoding) do |product|
       # It's easier and more explicit to work with Hash here instead of Array
       product = product.to_hash
 
@@ -42,12 +38,14 @@ class PriceList
 
   private
 
-  def build_headers
-    @brand = @header_params[:brand]
-    @code = @header_params[:code]
-    @stock = @header_params[:stock]
-    @cost = @header_params[:cost]
-    @name = @header_params[:name]
+  def set_params
+    @brand = @params[:brand]
+    @code = @params[:code]
+    @stock = @params[:stock]
+    @cost = @params[:cost]
+    @name = @params[:name]
+    @encoding = @params[:encoding]
+    @delimeter = @params[:delimeter]
   end
 
   # Destroys object by given pattern one by one
@@ -75,16 +73,15 @@ class PriceList
   def update_product!(existing_product, new_product_hash)
     existing_product.update(brand: new_product_hash[@brand].strip, code: new_product_hash[@code].strip,
                             stock: new_product_hash[@stock].strip,
-                            name: new_product_hash[@name].strip, cost: new_product_hash[@cost].strip)
-
+                            name: new_product_hash[@name].strip, cost: new_product_hash[@cost].strip.to_d)
     # Add +1 to skipped counter for stats
     @skipped_counter += 1
   end
 
   # Creates the product
   def create_product!(product_hash)
-    Product.new(brand: product_hash[@brand.strip], code: product_hash[@code].strip, stock: product_hash[@stock].strip,
-                name: product_hash[@name].strip, cost: product_hash[@cost].strip,
+    a = Product.new(brand: product_hash[@brand.strip], code: product_hash[@code].strip, stock: product_hash[@stock].strip,
+                name: product_hash[@name].strip, cost: product_hash[@cost].strip.to_d,
                 uid: build_uid(product_hash), price_list: @pricelist).save
 
     # Update this counter as well
