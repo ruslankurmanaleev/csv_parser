@@ -6,5 +6,23 @@
     .form-group
       = form.label("Выберите вложение или вложения", class: "header")
       = form.file_field(:attachments, class: 'form-control-file', required: true, multiple: true)
+    .form-group
+      b Внимательно введите эти параметры, если они отличаются!
+    .form-group
+      = form.label(:header_brand, "Название поля 'Производитель' из csv-списка")
+      = form.text_field(:header_brand, value: "Производитель")
+    .form-group
+      = form.label(:header_code, "Название поля 'Артикул' из csv-списка")
+      = form.text_field(:header_code, value: "Номер")
+    .form-group
+      = form.label(:header_stock, "Название поля 'Количество' из csv-списка")
+      = form.text_field(:header_stock, value: "Кол-во")
+    .form-group
+      = form.label(:header_cost, "Название поля 'Цена' из csv-списка")
+      = form.text_field(:header_cost, value: "Цена")
+    .form-group
+      = form.label(:header_name, "Название поля 'Наименование' из csv-списка")
+      = form.text_field(:header_name, value: "Наименование")
+
     .actions.form-group
       = form.submit("Обработать список", class: "confirm-button")

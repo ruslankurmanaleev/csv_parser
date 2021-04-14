@@ -5,14 +5,16 @@ class PriceList
   ENCODING = "windows-1251".freeze
   DELIMITER = ";".freeze
 
-  def initialize(name, file)
-    @name = name
+  def initialize(name, file, header_params)
+    @pricelist = name
     @file_path = file
+    @header_params = header_params
     @skipped_counter = 0
     @created_counter = 0
   end
 
   def parse
+    build_headers
     # We need to clean all existing data with the same PriceList name
     erase_price_list_if_exists!
 
@@ -25,7 +27,7 @@ class PriceList
       next if blank_params?(product)
 
       # Update stock for the product if it's required
-      product["Кол-во"] = format_stock(product["Кол-во"]) if need_to_format_stock?(product["Кол-во"])
+      product[@stock] = format_stock(product[@stock]) if need_to_format_stock?(product[@stock])
 
       # Find existing Product with UID
       existing_product = fetch_existing_product_or_nil(product)
@@ -40,14 +42,22 @@ class PriceList
 
   private
 
+  def build_headers
+    @brand = @header_params[:brand]
+    @code = @header_params[:code]
+    @stock = @header_params[:stock]
+    @cost = @header_params[:cost]
+    @name = @header_params[:name]
+  end
+
   # Destroys object by given pattern one by one
   def erase_price_list_if_exists!
-    Product.where(price_list: @name).each { |list| list.destroy }
+    Product.where(price_list: @pricelist).each { |list| list.destroy }
   end
 
   # If any of these params are nil, then skip the product
   def blank_params?(obj)
-    obj["Производитель"].strip.blank? || obj["Номер"].blank? || obj["Наименование"].blank? || obj["Цена"].blank? || obj["Кол-во"].blank?
+    obj[@brand].strip.blank? || obj[@code].blank? || obj[@name].blank? || obj[@cost].blank? || obj[@stock].blank?
   end
 
   # Returns nil or Product that exists, and that has to be updated
@@ -63,9 +73,9 @@ class PriceList
 
   # Updates product. Because of we have a few params, it's faster to update them all instead of parsing and updating only different
   def update_product!(existing_product, new_product_hash)
-    existing_product.update(brand: new_product_hash["Производитель"].strip, code: new_product_hash["Номер"].strip,
-                            stock: new_product_hash["Кол-во"].strip,
-                            name: new_product_hash["Наименование"].strip, cost: new_product_hash["Цена"].strip)
+    existing_product.update(brand: new_product_hash[@brand].strip, code: new_product_hash[@code].strip,
+                            stock: new_product_hash[@stock].strip,
+                            name: new_product_hash[@name].strip, cost: new_product_hash[@cost].strip)
 
     # Add +1 to skipped counter for stats
     @skipped_counter += 1
@@ -73,9 +83,9 @@ class PriceList
 
   # Creates the product
   def create_product!(product_hash)
-    Product.new(brand: product_hash["Производитель"].strip, code: product_hash["Номер"].strip, stock: product_hash["Кол-во"].strip,
-                name: product_hash["Наименование"].strip, cost: product_hash["Цена"].strip,
-                uid: build_uid(product_hash), price_list: @name).save
+    Product.new(brand: product_hash[@brand.strip], code: product_hash[@code].strip, stock: product_hash[@stock].strip,
+                name: product_hash[@name].strip, cost: product_hash[@cost].strip,
+                uid: build_uid(product_hash), price_list: @pricelist).save
 
     # Update this counter as well
     @created_counter += 1
@@ -83,7 +93,7 @@ class PriceList
 
   # UID must be unique for one PriceList, and it must be "register-indepent", so downcase it as parsing via DB is slower
   def build_uid(product)
-    "#{product['Производитель']}#{product['Номер']}".downcase
+    "#{product[@brand]}#{product[@code]}".downcase
   end
 
   # If the stock has something like "> 10" (more than 10)
