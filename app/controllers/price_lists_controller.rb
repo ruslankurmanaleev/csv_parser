@@ -3,7 +3,7 @@ class PriceListsController < ApplicationController
   end
 
   def create
-    request = PriceList.new(fetch_name_from_params, fetch_path_from_params, fetch_headers_from_params).parse
+    request = PriceList.new(fetch_name_from_params, fetch_path_from_params, fetch_params).parse
 
     if request
       redirect_to(root_path, notice: "Файл обработан. Обновлено и создано #{request} записей соответственно")
@@ -22,13 +22,15 @@ class PriceListsController < ApplicationController
     params.dig(:price_list, :name)
   end
 
-  def fetch_headers_from_params
+  def fetch_params
     {
       brand: params.dig(:price_list, :header_brand),
       code: params.dig(:price_list, :header_code),
       stock: params.dig(:price_list, :header_stock),
       cost: params.dig(:price_list, :header_cost),
-      name: params.dig(:price_list, :header_name)
+      name: params.dig(:price_list, :header_name),
+      delimeter: params.dig(:price_list, :delimeter),
+      encoding: params.dig(:price_list, :encoding)
     }
   end
 end

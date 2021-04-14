@@ -23,6 +23,12 @@
     .form-group
       = form.label(:header_name, "Название поля 'Наименование' из csv-списка")
       = form.text_field(:header_name, value: "Наименование")
+    .form-group
+      = form.label(:delimeter, "Символ для разделителя")
+      = form.text_field(:delimeter, value: ";")
+    .form-group
+      = form.label(:encoding, "Кодировка файла")
+      = form.text_field(:encoding, value: "windows-1251")
 
     .actions.form-group
       = form.submit("Обработать список", class: "confirm-button")
