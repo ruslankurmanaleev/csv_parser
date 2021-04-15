@@ -13,3 +13,32 @@
  *= require_tree .
  *= require_self
  */
+
+.products_form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.form-group {
+  margin: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+form {
+  border: 4px double black;
+  background: rgb(208, 207, 207);
+  padding: 5px;
+}
+
+.confirm-button {
+  height: 50px;
+  text-transform: uppercase;
+}
+
+.flash_messages {
+  text-transform: uppercase;
+  color: red;
+}
