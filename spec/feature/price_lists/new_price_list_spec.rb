@@ -41,7 +41,7 @@ RSpec.feature "User processes the new Price List" do
       fill_in_default_form
 
       expect(page).to have_current_path(root_path)
-      expect(page).to have_content("Файл обработан. Обновлено и создано 0, 9 записей соответственно")
+      expect(page).to have_content("Файл обработан. Обновлено 0 и создано 9 записей соответственно")
       expect(Product.count).to eq 9
     end
   end
@@ -51,7 +51,7 @@ RSpec.feature "User processes the new Price List" do
       fill_in_complex_form()
 
       expect(page).to have_current_path(root_path)
-      expect(page).to have_content("Файл обработан. Обновлено и создано 0, 10 записей соответственно")
+      expect(page).to have_content("Файл обработан. Обновлено 0 и создано 10 записей соответственно")
       expect(Product.count).to eq 10
     end
   end
@@ -61,7 +61,7 @@ RSpec.feature "User processes the new Price List" do
       fill_in_complex_form2
 
       expect(page).to have_current_path(root_path)
-      expect(page).to have_content("Файл обработан. Обновлено и создано 0, 10 записей соответственно")
+      expect(page).to have_content("Файл обработан. Обновлено 0 и создано 10 записей соответственно")
       expect(Product.count).to eq 10
     end
   end

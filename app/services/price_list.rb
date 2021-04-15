@@ -14,26 +14,32 @@ class PriceList
     # We need to clean all existing data with the same PriceList name
     erase_price_list_if_exists!
 
+    begin
     # With each line of CSV file parse product with headers, so we can have a Hash later
-    CSV.foreach(@file_path, col_sep: @delimeter, row_sep: :auto, headers: true, force_quotes: true, encoding: @encoding) do |product|
-      # It's easier and more explicit to work with Hash here instead of Array
-      product = product.to_hash
+      CSV.foreach(@file_path, col_sep: @delimeter, row_sep: :auto, headers: true, force_quotes: true, encoding: @encoding) do |product|
+        # It's easier and more explicit to work with Hash here instead of Array
+        product = product.to_hash
 
-      # Skip lines with blank params
-      next if blank_params?(product)
+        # Skip lines with blank params
+        next if blank_params?(product)
 
-      # Update stock for the product if it's required
-      product[@stock] = format_stock(product[@stock]) if need_to_format_stock?(product[@stock])
+        # Update stock for the product if it's required
+        product[@stock] = format_stock(product[@stock]) if need_to_format_stock?(product[@stock])
 
-      # Find existing Product with UID
-      existing_product = fetch_existing_product_or_nil(product)
+        # Find existing Product with UID
+        existing_product = fetch_existing_product_or_nil(product)
 
-      next update_product!(existing_product, product) unless existing_product.nil?
+        next update_product!(existing_product, product) unless existing_product.nil?
 
-      create_product!(product)
+        create_product!(product)
+      end
+    rescue CSV::MalformedCSVError
+      return { status: false, message: "В CSV-файле есть ошибки. Невозможно обработать список" }
+    rescue Encoding::UndefinedConversionError
+      return { status: false, message: "Кодировка выбрана неправильно. Невозможно обработать список" }
     end
 
-    "#{@skipped_counter}, #{@created_counter}"
+    { status: true, message: "Файл обработан. Обновлено #{@skipped_counter} и создано #{@created_counter} записей соответственно" }
   end
 
   private

@@ -5,10 +5,10 @@ class PriceListsController < ApplicationController
   def create
     request = PriceList.new(fetch_name_from_params, fetch_path_from_params, fetch_params).parse
 
-    if request
-      redirect_to(root_path, notice: "Файл обработан. Обновлено и создано #{request} записей соответственно")
+    if request.dig(:status) == true
+      redirect_to(root_path, notice: request[:message])
     else
-      render :new
+      redirect_to(root_path, alert: request[:message])
     end
   end
 
